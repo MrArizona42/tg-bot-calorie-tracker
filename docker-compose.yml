@@ -2,7 +2,10 @@ version: "1.0"
 
 services:
   bot:
-    build: ./bot
+    build:
+      context: ./bot
     env_file:
       - .env
     restart: always
+    volumes:
+      - ./bot:/bot
