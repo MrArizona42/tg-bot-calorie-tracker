@@ -1,13 +1,13 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from config import BOT_TOKEN
+from settings.config import settings
 from handlers import start
 from middleware.logger import LoggingMiddleware
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=settings.BOT_TOKEN)
 dp = Dispatcher()
 
 dp.update.middleware(LoggingMiddleware())
