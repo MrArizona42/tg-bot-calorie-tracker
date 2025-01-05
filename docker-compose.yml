@@ -1,0 +1,8 @@
+version: "1.0"
+
+services:
+  bot:
+    build: ./bot
+    env_file:
+      - .env
+    restart: always
