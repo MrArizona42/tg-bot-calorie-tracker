@@ -1,18 +1,9 @@
-version: "1.0"
+version: "3.8"
 
 services:
-  bot:
-    build:
-      context: ./bot
-    env_file:
-      - .env
-    restart: always
-    volumes:
-      - ./bot:/bot
-
   db:
     image: postgres:15
-    container_name: telegram_bot_db
+    container_name: tg_postgres
     restart: always
     env_file:
       - .env
@@ -24,6 +15,35 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  fastapi:
+    image: tg_fastapi:latest
+    container_name: tg_fastapi
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./backend/app:/app
+    ports:
+      - "8000:8000"
+
+  bot:
+    image: tg_bot:latest
+    container_name: tg_bot
+    build:
+      context: ./bot
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - db
+      - fastapi
+    volumes:
+      - ./bot:/bot
 
 volumes:
   postgres_data:
