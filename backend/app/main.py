@@ -1,11 +1,9 @@
 from fastapi import FastAPI
+from api.routes.start import router as start_router
 
 app = FastAPI()
 
-
-@app.get("/")
-async def start():
-    return "Hi there! It's your FastAPI app responding!"
+app.include_router(start_router)
 
 # Connect to database when app starts
 # @app.on_event("startup")

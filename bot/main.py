@@ -2,7 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from settings.config import settings
-from handlers import start
+from handlers.start import router as start_router
 from middleware.logger import LoggingMiddleware
 
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +12,7 @@ dp = Dispatcher()
 
 dp.update.middleware(LoggingMiddleware())
 
-dp.include_router(start.router)
+dp.include_router(start_router)
 
 
 async def main():
