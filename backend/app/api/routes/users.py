@@ -60,3 +60,23 @@ async def create_user(user: UserCreate):
         raise HTTPException(status_code=400, detail=str(e))
     finally:
         await conn.close()
+
+
+@router.delete("/delete_user/{telegram_id}")
+async def delete_user(telegram_id: int):
+    conn = await get_db_connection()
+    try:
+        result = await conn.execute(
+            "DELETE FROM users WHERE telegram_id = $1", telegram_id
+        )
+
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return {"message": "User deleted successfully"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    finally:
+        await conn.close()
