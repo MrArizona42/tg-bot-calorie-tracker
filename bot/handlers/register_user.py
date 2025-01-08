@@ -1,3 +1,4 @@
+import json
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -24,6 +25,14 @@ class UserRegistration(StatesGroup):
 
 @router.message(Command("new_user"))
 async def cmd_new_user(message: Message, state: FSMContext):
+    async with httpx.AsyncClient() as client:
+        user_data = {"telegram_id": message.from_user.id}
+        response = await client.post(FASTAPI_URL + "/check_user_exist", json=user_data)
+        if response.status_code == 200:
+            await message.answer("This account has already been registered.")
+            await state.clear()
+            return
+
     await state.update_data(telegram_id=message.from_user.id)
     await message.answer("What's your name?")
     await state.set_state(UserRegistration.name)
