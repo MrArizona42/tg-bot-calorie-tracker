@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     age INT,
     weight NUMERIC(5,2),
+    height NUMERIC(5,2),
     city VARCHAR(255),
     target_active_minutes_per_day INT DEFAULT 30,
     target_calories_per_day INT DEFAULT 2000

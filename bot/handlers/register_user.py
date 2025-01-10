@@ -1,4 +1,3 @@
-import json
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -18,6 +17,7 @@ class UserRegistration(StatesGroup):
     name = State()
     age = State()
     weight = State()
+    height = State()
     city = State()
     target_active_minutes_per_day = State()
     target_calories_per_day = State()
@@ -51,6 +51,7 @@ async def process_age(message: Message, state: FSMContext):
         await message.answer("Please enter a valid age.")
         return
     await state.update_data(age=int(message.text))
+
     await message.answer("What's your weight (kg)?")
     await state.set_state(UserRegistration.weight)
 
@@ -60,10 +61,25 @@ async def process_weight(message: Message, state: FSMContext):
     try:
         weight = float(message.text)
         await state.update_data(weight=weight)
-        await message.answer("Enter your city (for weather tracking):")
-        await state.set_state(UserRegistration.city)
     except ValueError:
         await message.answer("Please enter a valid weight.")
+        return
+
+    await message.answer("Enter your height in centimeters:")
+    await state.set_state(UserRegistration.height)
+
+
+@router.message(UserRegistration.height)
+async def process_height(message: Message, state: FSMContext):
+    try:
+        height = float(message.text)
+        await state.update_data(height=height)
+    except ValueError:
+        await message.answer("Please enter a valid height.")
+        return
+
+    await message.answer("Enter your city (for weather tracking):")
+    await state.set_state(UserRegistration.city)
 
 
 @router.message(UserRegistration.city)

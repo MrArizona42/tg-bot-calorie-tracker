@@ -16,6 +16,7 @@ class UserCreate(BaseModel):
     name: str
     age: int
     weight: float
+    height: float
     city: str
     target_active_minutes_per_day: int
     target_calories_per_day: int
@@ -36,7 +37,7 @@ async def check_user_exist(user: CheckUserExist):
         raise HTTPException(status_code=400, detail=str(e))
     finally:
         await conn.close()
-    
+
     if len(user_data) > 0:
         return Response(status_code=200)
     else:
@@ -49,10 +50,11 @@ async def create_user(user: UserCreate):
     try:
         await conn.execute(
             """
-            INSERT INTO users (telegram_id, name, age, weight, city, target_active_minutes_per_day, target_calories_per_day)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO users (telegram_id, name, age, weight, height, city,
+                target_active_minutes_per_day, target_calories_per_day)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             """,
-            user.telegram_id, user.name, user.age, user.weight, user.city,
+            user.telegram_id, user.name, user.age, user.weight, user.height, user.city,
             user.target_active_minutes_per_day, user.target_calories_per_day
         )
         return {"message": "User created successfully"}
@@ -74,9 +76,9 @@ async def delete_user(telegram_id: int):
             raise HTTPException(status_code=404, detail="User not found")
 
         return {"message": "User deleted successfully"}
-    
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
     finally:
         await conn.close()
