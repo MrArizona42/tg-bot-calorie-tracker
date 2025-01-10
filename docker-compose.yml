@@ -4,7 +4,6 @@ services:
   db:
     image: postgres:15
     container_name: tg_postgres
-    restart: always
     env_file:
       - .env
     environment:
@@ -24,7 +23,6 @@ services:
       context: ./backend
     env_file:
       - .env
-    restart: always
     depends_on:
       - db
     volumes:
@@ -39,7 +37,6 @@ services:
       context: ./bot
     env_file:
       - .env
-    restart: always
     depends_on:
       - db
       - fastapi
