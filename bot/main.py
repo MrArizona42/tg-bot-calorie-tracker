@@ -6,6 +6,7 @@ from settings.config import settings
 from handlers.start import router as start_router
 from handlers.register_user import router as new_user_router
 from handlers.delete_user import router as delete_user_router
+from handlers.food import router as food_router
 from middleware.logger import LoggingMiddleware
 
 logging.basicConfig(level=logging.INFO)
@@ -18,6 +19,7 @@ dp.update.middleware(LoggingMiddleware())
 dp.include_router(start_router)
 dp.include_router(new_user_router)
 dp.include_router(delete_user_router)
+dp.include_router(food_router)
 
 
 async def main():
