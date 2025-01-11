@@ -6,8 +6,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("logs/bot.log"),  # Save logs to a file
-        logging.StreamHandler()          # Print logs to the console
+        logging.FileHandler("logs/bot.log"),
+        logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
