@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
+from aiogram.types import BotCommand
 
 from settings.config import settings
 from handlers.start import router as start_router
@@ -20,6 +21,19 @@ dp.include_router(start_router)
 dp.include_router(new_user_router)
 dp.include_router(delete_user_router)
 dp.include_router(food_router)
+
+
+async def setup_bot_commands():
+    bot_commands = [
+        BotCommand(command="/start", description="Welcome message, check connection"),
+        BotCommand(command="/new_user", description="Register a new user"),
+        BotCommand(command="/delete_user", description="Delete user"),
+        BotCommand(command="/log_food", description="Log food")
+    ]
+    await bot.set_my_commands(bot_commands)
+
+
+dp.startup.register(setup_bot_commands)
 
 
 async def main():
