@@ -40,7 +40,8 @@ async def setup_bot_commands():
         BotCommand(command="/log_water", description="Log water intake"),
         BotCommand(command="/check_today_water", description="Check how much water you've consumed today"),
         BotCommand(command="/log_workout", description="Log a workout"),
-        BotCommand(command="/check_today_workouts", description="Check how much sport you've done today")
+        BotCommand(command="/check_today_workouts", description="Check how much sport you've done today"),
+        BotCommand(command="/summary", description="Summary of today")
     ]
     await bot.set_my_commands(bot_commands)
 
