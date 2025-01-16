@@ -55,6 +55,21 @@ async def get_calories(food_name: str, food_api_key: str) -> float | None:
     return None
 
 
+async def send_log_food(food_data):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(FASTAPI_URL + "/log_food", json=food_data)
+        logger.info(f'Response from fast-api: {response.text}')
+        if response.status_code == 200:
+            message = f"🍎 Your {food_data.get('food_name').capitalize()} had {food_data.get('food_weight')} grams \
+                        and {food_data.get('calories_consumed')} kcal. \
+                        The food has been logged"
+        else:
+            error_text = response.text
+            message = f"Error: {error_text}"
+
+    return message
+
+
 @router.message(Command("log_food"))
 async def cmd_log_food(message: Message, state: FSMContext):
     async with httpx.AsyncClient() as client:
@@ -97,18 +112,10 @@ async def process_food_entry(message: Message, state: FSMContext):
         await state.update_data(calories=calories_consumed)
 
         food_data = await state.get_data()
-        async with httpx.AsyncClient() as client:
-            response = await client.post(FASTAPI_URL + "/log_food", json=food_data)
-            logger.info(f'Response from fast-api: {response.text}')
-            if response.status_code != 200:
-                error_text = response.text
-                await message.answer(f"Error: {error_text}")
-                return
 
-        await message.answer(f"🍎 Your {food_name.capitalize()} had {food_weight} grams and {calories_consumed} kcal. \
-                             The food has been logged")
+        message_text = await send_log_food(food_data)
+        await message.answer(message_text)
         await state.clear()
-        # return
     else:
         await message.answer(
             f"⚠️ Sorry, I couldn't find calorie data for {food_name}.\n"
@@ -133,15 +140,7 @@ async def handle_manual_calories(message: Message, state: FSMContext):
     await state.update_data(calories=calories_consumed)
 
     food_data = await state.get_data()
-    async with httpx.AsyncClient() as client:
-        response = await client.post(FASTAPI_URL + "/log_food", json=food_data)
-        logger.info(f'Response from fast-api: {response.text}')
-        if response.status_code != 200:
-            error_text = response.text
-            await message.answer(f"Error: {error_text}")
-            return
 
-    food_name = food_data.get("food_name")
-    await message.answer(f"🍎 Your {food_name.capitalize()} had {food_weight} grams and {calories_consumed} kcal. \
-                            The food has been logged")
+    message_text = await send_log_food(food_data)
+    await message.answer(message_text)
     await state.clear()
