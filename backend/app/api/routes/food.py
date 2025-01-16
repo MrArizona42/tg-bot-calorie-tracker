@@ -7,10 +7,6 @@ from db.session import get_db_connection
 router = APIRouter()
 
 
-class TelegtamID(BaseModel):
-    telegram_id: int
-
-
 class NewFood(BaseModel):
     telegram_id: int
     food_name: str
