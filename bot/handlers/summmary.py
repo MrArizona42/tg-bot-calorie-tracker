@@ -35,3 +35,22 @@ async def check_today_intake(message: Message):
                 message_text += f'{row['food_name']}: {row['calories']}\n'
 
             await message.answer(message_text)
+
+
+@router.message(Command("check_today_water"))
+async def check_today_water(message: Message):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(FASTAPI_URL + f"/check_user_exist/{message.from_user.id}")
+        if response.status_code != 200:
+            await message.answer("Account is not found. \
+                Please try to register your account first using /new_user command")
+
+            return
+
+        else:
+            response = await client.get(FASTAPI_URL + f"/check_today_water/{message.from_user.id}")
+            total_volume = response.json().get('total_volume')
+
+            message_text = f"Your water intake today: {total_volume} ml"
+
+            await message.answer(message_text)

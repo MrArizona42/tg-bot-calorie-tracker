@@ -8,7 +8,8 @@ from handlers.start import router as start_router
 from handlers.new_user import router as new_user_router
 from handlers.delete_user import router as delete_user_router
 from handlers.log_food import router as log_food_router
-from handlers.summmary import router as check_today_intake_router
+from handlers.summmary import router as summary_router
+from handlers.log_water import router as log_water_router
 from middleware.logger import LoggingMiddleware
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +23,8 @@ dp.include_router(start_router)
 dp.include_router(new_user_router)
 dp.include_router(delete_user_router)
 dp.include_router(log_food_router)
-dp.include_router(check_today_intake_router)
+dp.include_router(summary_router)
+dp.include_router(log_water_router)
 
 
 async def setup_bot_commands():
@@ -31,7 +33,9 @@ async def setup_bot_commands():
         BotCommand(command="/new_user", description="Register a new user"),
         BotCommand(command="/delete_user", description="Delete user"),
         BotCommand(command="/log_food", description="Log food"),
-        BotCommand(command="/check_today_intake", description="Calories that you've eaten today")
+        BotCommand(command="/check_today_intake", description="Calories that you've eaten today"),
+        BotCommand(command="/log_water", description="Log water intake"),
+        BotCommand(command="/check_today_water", description="Check how much water have you drank today"),
     ]
     await bot.set_my_commands(bot_commands)
 
