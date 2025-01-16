@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS workout_log (
     telegram_id BIGINT NOT NULL,
     event_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     type TEXT NOT NULL,
-    length INTEGER CHECK (length > 0), -- Minutes
+    duration INTEGER CHECK (duration > 0), -- Minutes
     calories INTEGER CHECK (calories >= 0),
     FOREIGN KEY (telegram_id) REFERENCES users(telegram_id) ON DELETE CASCADE
 );
