@@ -40,12 +40,6 @@ async def get_weather(city, token):
     
     return response
 
-    if response.status_code == 200:
-        response.json()['main']['temp']
-    else:
-        error_text = response.text
-        message = f"Error: {error_text}"
-
 
 async def send_log_workout(workout_data):
     async with httpx.AsyncClient() as client:
