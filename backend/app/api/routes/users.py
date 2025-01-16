@@ -35,7 +35,7 @@ async def check_user_exist(telegram_id: int):
         await conn.close()
 
     if len(user_data) > 0:
-        return Response(status_code=200)
+        return user_data[0]
     else:
         raise HTTPException(status_code=404, detail="User not found")
 
