@@ -11,6 +11,8 @@ class Workout(BaseModel):
     type: str
     duration: int
     calories: int
+    # water: int
+    temperature: float
 
 
 @router.post("/log_workout")
@@ -19,10 +21,11 @@ async def log_workout(workout: Workout):
     try:
         await conn.execute(
             """
-            INSERT INTO workout_log (telegram_id, type, duration, calories)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO workout_log (telegram_id, type, duration, calories, temperature)
+            VALUES ($1, $2, $3, $4, $5)
             """,
-            workout.telegram_id, workout.type, workout.duration, workout.calories
+            workout.telegram_id, workout.type, workout.duration, workout.calories,
+            workout.temperature
         )
         return {"message": "Workout logged successfully"}
     except Exception as e:

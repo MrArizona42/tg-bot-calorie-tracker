@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 FASTAPI_URL = settings.FASTAPI_URL
-FOOD_API_KEY = settings.FOOD_API_KEY
+WEATHER_API_KEY = settings.WEATHER_API_KEY
 
 router = Router()
 
@@ -23,6 +23,28 @@ class WorkoutLogging(StatesGroup):
     type = State()
     duration = State()
     calories = State()
+    # water = State()
+    temperature = State()
+
+
+async def get_weather(city, token):
+    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "q": city,
+        "appid": token,
+        "units": "metric"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(base_url, params=params)
+    
+    return response
+
+    if response.status_code == 200:
+        response.json()['main']['temp']
+    else:
+        error_text = response.text
+        message = f"Error: {error_text}"
 
 
 async def send_log_workout(workout_data):
@@ -47,8 +69,17 @@ async def cmd_log_workout(message: Message, state: FSMContext):
                 Please try to register your account first using /new_user command")
             await state.clear()
             return
+        else:
+            city = response.json()['city']
+
+    response = await get_weather(city=city, token=WEATHER_API_KEY)
+    if response.status_code == 200:
+        temperature = response.json()['main']['temp']
+    else:
+        temperature = None
 
     await state.update_data(telegram_id=message.from_user.id)
+    await state.update_data(temperature=temperature)
 
     keyboard = InlineKeyboardBuilder()
     workouts = ["Jogging", "Cycling", "Weight Lifting"]
@@ -94,7 +125,27 @@ async def log_duration(message: Message, state: FSMContext):
 
     workout_data = await state.get_data()
 
-    response_message = await send_log_workout(workout_data)
-    await message.answer(response_message)
+    if workout_data['temperature'] is not None:
+        response_message = await send_log_workout(workout_data)
+        await message.answer(response_message)
 
-    await state.clear()
+        await state.clear()
+    else:
+        await message.answer("Couldn't get your weather. Please enter the approximate temperature today in Celcius")
+        await state.set_state(WorkoutLogging.temperature)
+
+
+@router.message(WorkoutLogging.temperature)
+async def log_temperature(message: Message, state: FSMContext):
+    try:
+        temperature = float(message.text.strip())
+        await state.update_date(temperature=temperature)
+
+        workout_data = await state.get_data()
+
+        response_message = await send_log_workout(workout_data)
+        await message.answer(response_message)
+
+        await state.clear()
+    except ValueError:
+        await message.answer("⚠️ Please enter a valid number for temperature in Celcius (e.g., `25`).")
