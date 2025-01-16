@@ -42,3 +42,6 @@ async def confirm_delete(message: Message, state: FSMContext):
             else:
                 error_text = response.text
                 await message.answer(f"Error: {error_text}")
+    else:
+        await message.answer("Operation canceled")
+        await state.clear()

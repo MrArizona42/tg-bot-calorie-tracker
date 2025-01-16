@@ -60,3 +60,5 @@ async def process_water_volume(message: Message, state: FSMContext):
     water_data = await state.get_data()
     message_text = await send_log_water(water_data)
     await message.answer(message_text)
+
+    await state.clear()
