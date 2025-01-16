@@ -61,7 +61,7 @@ async def send_log_food(food_data):
         logger.info(f'Response from fast-api: {response.text}')
         if response.status_code == 200:
             message = f"🍎 Your {food_data.get('food_name').capitalize()} had {food_data.get('food_weight')} grams \
-                        and {food_data.get('calories_consumed')} kcal. \
+                        and {food_data.get('calories')} kcal. \
                         The food has been logged"
         else:
             error_text = response.text
@@ -73,8 +73,7 @@ async def send_log_food(food_data):
 @router.message(Command("log_food"))
 async def cmd_log_food(message: Message, state: FSMContext):
     async with httpx.AsyncClient() as client:
-        user_data = {"telegram_id": message.from_user.id}
-        response = await client.post(FASTAPI_URL + "/check_user_exist", json=user_data)
+        response = await client.get(FASTAPI_URL + f"/check_user_exist/{message.from_user.id}")
         if response.status_code != 200:
             await message.answer("Account is not found. \
                 Please try to register your account first using /new_user command")

@@ -26,8 +26,7 @@ class UserRegistration(StatesGroup):
 @router.message(Command("new_user"))
 async def cmd_new_user(message: Message, state: FSMContext):
     async with httpx.AsyncClient() as client:
-        user_data = {"telegram_id": message.from_user.id}
-        response = await client.post(FASTAPI_URL + "/check_user_exist", json=user_data)
+        response = await client.get(FASTAPI_URL + f"/check_user_exist/{message.from_user.id}")
         if response.status_code == 200:
             await message.answer("This account has already been registered.")
             await state.clear()

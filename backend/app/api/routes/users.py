@@ -7,10 +7,6 @@ from db.session import get_db_connection
 router = APIRouter()
 
 
-class CheckUserExist(BaseModel):
-    telegram_id: int
-
-
 class UserCreate(BaseModel):
     telegram_id: int
     name: str
@@ -22,15 +18,15 @@ class UserCreate(BaseModel):
     target_calories_per_day: int
 
 
-@router.post("/check_user_exist")
-async def check_user_exist(user: CheckUserExist):
+@router.get("/check_user_exist/{telegram_id}")
+async def check_user_exist(telegram_id: int):
     conn = await get_db_connection()
     try:
         user_data = await conn.fetch(
             f"""
             SELECT *
             FROM users
-            WHERE telegram_id = {user.telegram_id}
+            WHERE telegram_id = {telegram_id}
             """
         )
     except Exception as e:

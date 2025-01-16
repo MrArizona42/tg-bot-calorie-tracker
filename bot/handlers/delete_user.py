@@ -20,8 +20,7 @@ class UserDelete(StatesGroup):
 @router.message(Command("delete_user"))
 async def delete_user(message: Message, state: FSMContext):
     async with httpx.AsyncClient() as client:
-        user_data = {"telegram_id": message.from_user.id}
-        response = await client.post(FASTAPI_URL + "/check_user_exist", json=user_data)
+        response = await client.get(FASTAPI_URL + f"/check_user_exist/{message.from_user.id}")
         if response.status_code == 200:
             await message.answer("This action will permanently delete your data. \
                                  Do you wish to continue? Type 'yes', if you agree.")
