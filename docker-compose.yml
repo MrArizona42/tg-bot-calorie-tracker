@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: tg_postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/app/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  fastapi:
+    image: tg_fastapi:latest
+    container_name: tg_fastapi
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./backend/app:/app
+    ports:
+      - "8000:8000"
+
+  bot:
+    image: tg_bot:latest
+    container_name: tg_bot
+    build:
+      context: ./bot
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - fastapi
+    volumes:
+      - ./bot:/bot
+
+volumes:
+  postgres_data:

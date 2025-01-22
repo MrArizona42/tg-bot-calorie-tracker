@@ -1,0 +1,6 @@
+fastapi[all]
+uvicorn
+asyncpg
+pydantic
+pydantic-settings
+python-dotenv
