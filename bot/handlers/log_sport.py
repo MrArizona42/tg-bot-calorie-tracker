@@ -37,7 +37,7 @@ async def get_weather(city, token):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(base_url, params=params)
-    
+
     return response
 
 
@@ -47,7 +47,9 @@ async def send_log_workout(workout_data):
         logger.info(f'Response from fast-api: {response.text}')
         if response.status_code == 200:
             message = "The workout has been logged\n"
-            message += f"You spent about {workout_data['water_spent']} ml of water. Time to restore your water balance!"
+            message += f"You spent about {workout_data['water_spent']} ml of water. "
+            message += "Time to restore your water balance!\n"
+            message += f"Also, you've burned {workout_data['calories']} kcal. Nicely done!"
         else:
             error_text = response.text
             message = f"Error: {error_text}"
@@ -108,7 +110,7 @@ async def log_duration(message: Message, state: FSMContext):
     except ValueError:
         await message.answer("Please enter a valid number of minutes.")
         return
-    
+
     workout_data = await state.get_data()
     w_type = workout_data.get('type')
     if w_type == 'Jogging':
