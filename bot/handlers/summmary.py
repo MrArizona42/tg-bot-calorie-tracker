@@ -28,6 +28,7 @@ async def summary(message: Message):
             return
         
         else:
+            workout_target = response.json().get('target_active_minutes_per_day', 0)
             food_url = FASTAPI_URL + f"/check_today_intake/{message.from_user.id}"
             water_url = FASTAPI_URL + f"/check_today_water/{message.from_user.id}"
             workouts_url = FASTAPI_URL + f"/check_today_workouts/{message.from_user.id}"
@@ -40,13 +41,14 @@ async def summary(message: Message):
 
             consumed_calories = responses[0].json().get('total_calories', 0)
             consumed_water = responses[1].json().get('total_volume', 0)
-            workout = responses[2].json().get('total_time', 0)
+            workout_actual = responses[2].json().get('total_time', 0)
             workout_calories = responses[2].json().get('total_calories', 0)
+            workout_water = responses[2].json().get('total_water', 0)
 
-            message_text = f"Your calories intake today: {consumed_calories}\n"
-            message_text += f"Total water consumprion: {consumed_water}\n"
-            message_text += f"Total workout time: {workout}\n"
-            message_text += f"Total calories burned: {workout_calories}"
+            message_text = "Here's your today's summary:\n"
+            message_text += f"Calories eaten / burned: {consumed_calories} / {workout_calories} kcal\n"
+            message_text += f"Water consumed / spent: {consumed_water} / {workout_water} ml\n"
+            message_text += f"Workout time actual / target: {workout_actual} / {workout_target} min\n"
 
             await message.answer(message_text)
 

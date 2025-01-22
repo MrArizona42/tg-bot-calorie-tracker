@@ -62,9 +62,21 @@ async def check_today_workouts(telegram_id: int):
         )
         total_calories = total_calories[0].get('total_calories')
 
+        total_water = await conn.fetch(
+            """
+            SELECT SUM(water_spent) as total_calories
+            FROM workout_log
+            WHERE DATE_TRUNC('day', event_time) = DATE_TRUNC('day', now())
+                AND telegram_id = $1
+            """,
+            telegram_id
+        )
+        total_water = total_water[0].get('total_calories')
+
         result = {
             'total_time': total_time,
-            'total_calories': total_calories
+            'total_calories': total_calories,
+            'total_water': total_water
         }
 
         return result
