@@ -26,7 +26,7 @@ async def summary(message: Message):
                 Please try to register your account first using /new_user command")
 
             return
-        
+
         else:
             workout_target = response.json().get('target_active_minutes_per_day', 0)
             food_url = FASTAPI_URL + f"/check_today_intake/{message.from_user.id}"
