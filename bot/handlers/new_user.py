@@ -107,7 +107,12 @@ async def process_calories(message: Message, state: FSMContext):
 
     user_data = await state.get_data()
 
-    await message.answer(f"Your data: {user_data}")
+    message_text = 'Your data:\n'
+
+    for key, value in user_data.items():
+        message_text += f'{key}: {value}\n'
+
+    await message.answer(message_text)
 
     async with httpx.AsyncClient() as client:
         response = await client.post(FASTAPI_URL + "/register_user", json=user_data)

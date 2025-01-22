@@ -60,9 +60,9 @@ async def send_log_food(food_data):
         response = await client.post(FASTAPI_URL + "/log_food", json=food_data)
         logger.info(f'Response from fast-api: {response.text}')
         if response.status_code == 200:
-            message = f"🍎 Your {food_data.get('food_name').capitalize()} had {food_data.get('food_weight')} grams \
-                        and {food_data.get('calories')} kcal. \
-                        The food has been logged"
+            message = f"🍎 The {food_data.get('food_name').capitalize()} was {food_data.get('food_weight')} grams "
+            message += f"and had {food_data.get('calories')} kcal.\n"
+            message += "The food has been logged"
         else:
             error_text = response.text
             message = f"Error: {error_text}"
@@ -82,8 +82,8 @@ async def cmd_log_food(message: Message, state: FSMContext):
 
     await state.update_data(telegram_id=message.from_user.id)
 
-    await message.answer("What did you eat today? Enter the food name and amount in grams.\n\n\
-                             For example: 'banana 150'")
+    await message.answer("What did you eat today? Enter the food name and amount in grams.\n"
+                         "For example: 'banana 150'")
 
     await state.set_state(FoodLogging.food_name)
 
@@ -94,7 +94,7 @@ async def process_food_entry(message: Message, state: FSMContext):
 
     if not match:
         await message.answer(
-            "Please enter the food in the format: food_name amount_in_grams\n\n"
+            "Please enter the food in the format: food_name amount_in_grams\n"
             "Example: 'banana 150'"
         )
         return
