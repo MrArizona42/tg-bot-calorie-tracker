@@ -23,8 +23,8 @@ class WorkoutLogging(StatesGroup):
     type = State()
     duration = State()
     calories = State()
-    # water = State()
     temperature = State()
+    water_spent = State()
 
 
 async def get_weather(city, token):
@@ -46,7 +46,8 @@ async def send_log_workout(workout_data):
         response = await client.post(FASTAPI_URL + "/log_workout", json=workout_data)
         logger.info(f'Response from fast-api: {response.text}')
         if response.status_code == 200:
-            message = "The workout has been logged"
+            message = "The workout has been logged\n"
+            message += f"You spent about {workout_data['water_spent']} ml of water. Time to restore your water balance!"
         else:
             error_text = response.text
             message = f"Error: {error_text}"
@@ -56,6 +57,7 @@ async def send_log_workout(workout_data):
 
 @router.message(Command("log_workout"))
 async def cmd_log_workout(message: Message, state: FSMContext):
+    # Check if the user exists
     async with httpx.AsyncClient() as client:
         response = await client.get(FASTAPI_URL + f"/check_user_exist/{message.from_user.id}")
         if response.status_code != 200:
@@ -66,6 +68,7 @@ async def cmd_log_workout(message: Message, state: FSMContext):
         else:
             city = response.json()['city']
 
+    # Check temperature if possible
     response = await get_weather(city=city, token=WEATHER_API_KEY)
     if response.status_code == 200:
         temperature = response.json()['main']['temp']
@@ -75,6 +78,7 @@ async def cmd_log_workout(message: Message, state: FSMContext):
     await state.update_data(telegram_id=message.from_user.id)
     await state.update_data(temperature=temperature)
 
+    # Start workout logging
     keyboard = InlineKeyboardBuilder()
     workouts = ["Jogging", "Cycling", "Weight Lifting"]
     for workout in workouts:
@@ -109,13 +113,17 @@ async def log_duration(message: Message, state: FSMContext):
     w_type = workout_data.get('type')
     if w_type == 'Jogging':
         calories = duration * 10
+        water_spent = duration * 18
     elif w_type == 'Cycling':
         calories = duration * 8
+        water_spent = duration * 14
     elif w_type == 'Weight Lifting':
         calories = duration * 6
+        water_spent = duration * 10
 
     await state.update_data(duration=duration)
     await state.update_data(calories=calories)
+    await state.update_data(water_spent=water_spent)
 
     workout_data = await state.get_data()
 
@@ -135,6 +143,9 @@ async def log_temperature(message: Message, state: FSMContext):
         temperature = float(message.text.strip())
         await state.update_date(temperature=temperature)
 
+        workout_data = await state.get_data()
+        if temperature > 25:
+            await state.update_data(water_spent=workout_data['water_spent'] * 1.5)
         workout_data = await state.get_data()
 
         response_message = await send_log_workout(workout_data)
