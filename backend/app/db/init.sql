@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS workout_log (
     type TEXT NOT NULL,
     duration INTEGER CHECK (duration > 0), -- Minutes
     calories INTEGER CHECK (calories >= 0),
-    -- water INTEGER CHECK (water >= 0),
+    water_spent INTEGER CHECK (water_spent >= 0),
     temperature NUMERIC(5,2),
     FOREIGN KEY (telegram_id) REFERENCES users(telegram_id) ON DELETE CASCADE
 );
