@@ -94,7 +94,19 @@ async def process_target_minutes(message: Message, state: FSMContext):
         await message.answer("Please enter a valid number.")
         return
     await state.update_data(target_active_minutes_per_day=int(message.text))
-    await message.answer("What's your daily calorie intake target?")
+
+    user_data = await state.get_data()
+
+    base_calories = 10 * user_data['weight'] + 6.25 * user_data['height'] - 5 * user_data['age']
+    workout_calories = (6 * user_data['target_active_minutes_per_day'], 10 * user_data['target_active_minutes_per_day'])
+    total_min = base_calories + workout_calories[0]
+    total_max = base_calories + workout_calories[1]
+
+    message_text = "What's your daily calorie intake target?\n"
+    message_text += f'Your base consumption is recommended to be: {base_calories} kcal\n'
+    message_text += f'Plus, you are going to spend {workout_calories[0]} - {workout_calories[1]} kcal on workouts\n'
+    message_text += f'So, the total recommended calories intake amount is: {total_min} - {total_max} kcal'
+    await message.answer(message_text)
     await state.set_state(UserRegistration.target_calories_per_day)
 
 
